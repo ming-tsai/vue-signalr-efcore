@@ -70,7 +70,7 @@ namespace SignalR.API.Controllers
                     .Clients
                     .Group(id.ToString())
                     .AnswerAdded(answer);
-            return new JsonResult(answer);
+            return Ok(answer);
         }
 
         [HttpPatch("{id}/upvote")]
@@ -85,7 +85,7 @@ namespace SignalR.API.Controllers
                     .Clients
                     .All
                     .QuestionScoreChange(question.Id, question.Score);
-            return new JsonResult(question);
+            return Ok(question);
         }
     }
 }
