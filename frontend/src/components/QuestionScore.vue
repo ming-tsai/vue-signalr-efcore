@@ -16,7 +16,7 @@
   </h3>
 </template>
 <script>
-import axios from "axios";
+import axios from 'axios';
 export default {
   props: {
     question: {
@@ -24,12 +24,13 @@ export default {
       required: true,
     },
   },
+  created() {
+    this.$questionHub.$on('score-changed', this.onScoreChanged);
+  },
   methods: {
     onUpvote() {
       axios
-        .patch(
-          `${process.env.BACKEND_ENDPOINT}/api/question/${this.question.id}/upvote`
-        )
+        .patch(`https://localhost:5001/api/question/${this.question.id}/upvote`)
         .then((res) => {
           Object.assign(this.question, res.data);
         });
@@ -37,11 +38,15 @@ export default {
     onDownvote() {
       axios
         .patch(
-          `${process.env.BACKEND_ENDPOINT}/api/question/${this.question.id}/downvote`
+          `https://localhost:5001/api/question/${this.question.id}/downvote`
         )
         .then((res) => {
           Object.assign(this.question, res.data);
         });
+    },
+    onScoreChanged({ questionId, score }) {
+      if (this.question.id !== questionId) return;
+      Object.assign(this.question, { score });
     },
   },
 };

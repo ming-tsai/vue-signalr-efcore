@@ -1,27 +1,17 @@
 <template>
   <b-modal
-    id="addQuestionModal"
-    ref="addQuestionModal"
+    id="addAnswerModal"
+    ref="addAnswerModal"
     hide-footer
-    title="Add new Question"
+    title="Add new Answer"
     @hidden="onHidden"
   >
     <b-form @submit.prevent="onSubmit" @reset.prevent="onCancel">
-      <b-form-group label="Title:" label-for="titleInput">
-        <b-form-input
-          id="titleInput"
-          type="text"
-          v-model="form.title"
-          required
-          placeholder="Please provide a title"
-        >
-        </b-form-input>
-      </b-form-group>
-      <b-form-group label="Your Question:" label-for="questionInput">
+      <b-form-group label="Your Answer:" label-for="answerInput">
         <b-form-textarea
-          id="questionInput"
+          id="answerInput"
           v-model="form.body"
-          placeholder="What do you need answered?"
+          placeholder="Provide an answer"
           :rows="6"
           :max-rows="10"
         >
@@ -40,6 +30,12 @@
 import axios from 'axios';
 
 export default {
+  props: {
+    questionId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       form: {
@@ -51,14 +47,17 @@ export default {
   methods: {
     onSubmit() {
       axios
-        .post(`https://localhost:5001/api/question`, this.form)
+        .post(
+          `https://localhost:5001/api/question/${this.questionId}/answer`,
+          this.form
+        )
         .then((res) => {
-          this.$emit('question-added', res.data);
-          this.$refs.addQuestionModal.hide();
+          this.$emit('answer-added', res.data);
+          this.$refs.addAnswerModal.hide();
         });
     },
     onCancel() {
-      this.$refs.addQuestionModal.hide();
+      this.$refs.addAnswerModal.hide();
     },
     onHidden() {
       Object.assign(this.form, {

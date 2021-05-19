@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import VueMarkdown from "vue-markdown";
-import QuestionScore from "@/components/QuestionScore";
+import VueMarkdown from 'vue-markdown';
+import QuestionScore from '@/components/QuestionScore';
 
 export default {
   components: {
@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     onOpenQuestion() {
-      this.$router.push({ name: "Question", params: { id: this.question.id } });
+      this.$router.push({ path: `/Question/${this.question.id}` });
     },
   },
 };

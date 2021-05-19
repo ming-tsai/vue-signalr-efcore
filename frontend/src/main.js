@@ -1,19 +1,20 @@
-import Vue from "vue";
-import App from "./App.vue";
-import router from "./router";
-
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import questionHub from './question-hub.js';
+Vue.use(questionHub);
 Vue.config.productionTip = false;
 
-import { install as VueMarkdown } from "vue-markdown/src/build";
+import { install as VueMarkdown } from 'vue-markdown/src/build';
 Vue.use(VueMarkdown);
 
-import BootstrapVue from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
-import "@fortawesome/fontawesome-free/css/all.css";
+import BootstrapVue from 'bootstrap-vue';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 Vue.use(BootstrapVue);
 
 new Vue({
   router,
   render: (h) => h(App),
-}).$mount("#app");
+}).$mount('#app');

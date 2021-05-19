@@ -22,9 +22,9 @@
 </template>
 
 <script>
-import QuestionPreview from "@/components/QuestionPreview";
-import AddQuestionModal from "@/components/AddQuestionModal";
-import axios from "axios";
+import QuestionPreview from '@/components/QuestionPreview';
+import AddQuestionModal from '@/components/AddQuestionModal';
+import axios from 'axios';
 
 export default {
   components: {
@@ -37,7 +37,7 @@ export default {
     };
   },
   created() {
-    axios.get(`${process.env.BACKEND_ENDPOINT}/api/question`).then((res) => {
+    axios.get(`https://localhost:5001/api/question`).then((res) => {
       this.questions = res.data;
     });
   },
@@ -45,6 +45,10 @@ export default {
     onQuestionAdded(question) {
       this.questions = [question, ...this.questions];
     },
+  },
+  beforeDestroy() {
+    // Make sure to cleanup SignalR event handlers when removing the component
+    this.$questionHub.$off('score-changed', this.onScoreChanged);
   },
 };
 </script>

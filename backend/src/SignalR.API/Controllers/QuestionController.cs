@@ -87,5 +87,20 @@ namespace SignalR.API.Controllers
                     .QuestionScoreChange(question.Id, question.Score);
             return Ok(question);
         }
+
+        [HttpPatch("{id}/downvote")]
+        public async Task<ActionResult> DownvoteQuestionAsync(Guid id)
+        {
+            var question = questions.FirstOrDefault(t => t.Id == id);
+            if (question == null) return NotFound();
+
+            // Warning, this increment isnt thread-safe! Use Interlocked methods
+            question.Score--;
+            await hubContext
+                    .Clients
+                    .All
+                    .QuestionScoreChange(question.Id, question.Score);
+            return Ok(question);
+        }
     }
 }
