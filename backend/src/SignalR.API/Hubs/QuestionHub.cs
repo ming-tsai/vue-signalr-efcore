@@ -10,6 +10,7 @@ namespace SignalR.API.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, questionId.ToString());
         }
+
         public async Task LeaveQuestionGroup(Guid questionId)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, questionId.ToString());
