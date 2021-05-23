@@ -6,12 +6,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using SignalR.API.Hubs;
+using SignalR.API.Migrations;
+using SignalR.API.Services;
 
 namespace SignalR.API
 {
@@ -32,8 +35,14 @@ namespace SignalR.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SignalR.API", Version = "v1" });
             });
+            services.AddDbContextPool<ApplicationDbContext>(options => {
+                options.UseSqlServer(Configuration.GetConnectionString("SqlServe"));
+            });
+
             services.AddCors();
             services.AddSignalR();
+
+            services.AddScoped<IQuestionService, QuestionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

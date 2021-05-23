@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.API.Hubs;
+using SignalR.API.Migrations;
 using SignalR.API.Models;
+using SignalR.API.Services;
 
 namespace SignalR.API.Controllers
 {
@@ -15,72 +17,43 @@ namespace SignalR.API.Controllers
     [ApiController]
     public class QuestionController : ControllerBase
     {
-        private static IEnumerable<Question> questions = new List<Question> {
-            new Question
-            {
-                Id = Guid.Parse("b00c58c0-df00-49ac-ae85-0a135f75e01b"),
-                Title = "Welcome",
-                Body = "Welcome to the _mini Stack Overflow_ rip-off!\nThis will help showcasing **SignalR** and its integration with **Vue**",
-                Answers = new List<Answer>{ new Answer { Body = "Sample answer" }}
-            }
-        };
-
         private readonly IHubContext<QuestionHub, IQuestionHub> hubContext;
-        public QuestionController(IHubContext<QuestionHub, IQuestionHub> questionHub)
+        private readonly IQuestionService service;
+        public QuestionController(
+            IQuestionService service,
+            IHubContext<QuestionHub, IQuestionHub> questionHub)
         {
+            this.service = service;
             this.hubContext = questionHub;
         }
 
         [HttpGet]
-        public IEnumerable GetQuestions()
-        {
-            return questions.Select(q => new
-            {
-                Id = q.Id,
-                Title = q.Title,
-                Body = q.Body,
-                Score = q.Score,
-                AnswerCount = q.Answers.Count()
-            });
-        }
+        public async Task<IEnumerable> GetAllAsync()
+            => await service.GetAllAsync();
 
         [HttpGet("{id}")]
-        public Question GetQuestion(Guid id)
-            => questions.FirstOrDefault(t => t.Id == id);
+        public async Task<Question> GetAsync(Guid id)
+            => await service.GetAsync(id);
 
         [HttpPost]
-        public Question AddQuestion([FromBody] Question question)
-        {
-            question.Id = Guid.NewGuid();
-            question.Answers = new List<Answer>();
-            questions.Append(question);
-            return question;
-        }
+        public async Task<Question> AddQuestionAsync([FromBody] Question question)
+            => await service.AddQuestionAsync(question);
 
         [HttpPost("{id}/answer")]
         public async Task<ActionResult> AddAnswerAsync(Guid id, [FromBody] Answer answer)
         {
-            var question = questions.FirstOrDefault(t => t.Id == id);
-            if (question == null) return NotFound();
-
-            answer.Id = Guid.NewGuid();
-            answer.QuestionId = id;
-            question.Answers.Append(answer);
+            var result = await service.AddAnswerAsync(id, answer);
             await hubContext
                     .Clients
                     .Group(id.ToString())
-                    .AnswerAdded(answer);
-            return Ok(answer);
+                    .AnswerAdded(result);
+            return Ok(result);
         }
 
         [HttpPatch("{id}/upvote")]
         public async Task<ActionResult> UpvoteQuestionAsync(Guid id)
         {
-            var question = questions.FirstOrDefault(t => t.Id == id);
-            if (question == null) return NotFound();
-
-            // Warning, this increment isnt thread-safe! Use Interlocked methods
-            question.Score++;
+            var question = await service.UpvoteQuestionAsync(id);
             await hubContext
                     .Clients
                     .All
@@ -91,11 +64,7 @@ namespace SignalR.API.Controllers
         [HttpPatch("{id}/downvote")]
         public async Task<ActionResult> DownvoteQuestionAsync(Guid id)
         {
-            var question = questions.FirstOrDefault(t => t.Id == id);
-            if (question == null) return NotFound();
-
-            // Warning, this increment isnt thread-safe! Use Interlocked methods
-            question.Score--;
+            var question = await service.UpvoteQuestionAsync(id);
             await hubContext
                     .Clients
                     .All
