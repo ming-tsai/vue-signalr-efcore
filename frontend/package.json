@@ -1,6 +1,6 @@
 {
-  "name": "vue-signalr-app",
-  "version": "0.1.0",
+  "name": "vue-signalr-efcore",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

@@ -1,4 +1,4 @@
-# vue-signalr-app
+# Frontend
 
 ## Project setup
 ```
