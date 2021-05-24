@@ -7,7 +7,7 @@
         <p><vue-markdown :source="question.body" /></p>
         <a href="#" class="card-link">
           View question
-          <span class="badge badge-success">{{ question.answerCount }}</span>
+          <span class="badge badge-success">{{ question.answers.length }}</span>
         </a>
       </div>
     </div>

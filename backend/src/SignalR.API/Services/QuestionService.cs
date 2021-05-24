@@ -1,11 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SignalR.API.Migrations;
 using SignalR.API.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SignalR.API.Services
 {
@@ -25,7 +24,7 @@ namespace SignalR.API.Services
             {
                 answer.Id = Guid.NewGuid();
                 answer.QuestionId = id;
-                question.Answers.Append(answer);
+                _ = await dbContext.Answers.AddAsync(answer);
                 _ = await dbContext.SaveChangesAsync();
                 result = answer;
             }
@@ -40,30 +39,47 @@ namespace SignalR.API.Services
             return question;
         }
 
-        public async Task<IEnumerable> GetAllAsync()
+        public async Task<IEnumerable<Question>> GetAllAsync()
         {
-            IEnumerable result = null;
+            IEnumerable<Question> result = null;
             var query = dbContext.Questions.Include((x) => x.Answers);
             if (await query.AnyAsync())
             {
-                result = await query
-                                .Select(q => new
-                                {
-                                    Id = q.Id,
-                                    Title = q.Title,
-                                    Body = q.Body,
-                                    Score = q.Score,
-                                    Answers = q.Answers,
-                                    AnswerCount = q.Answers.Count()
-                                })
-                                .ToListAsync();
+                var data = await query.ToListAsync();
+                result = data.Select((q) => new Question()
+                {
+                    Id = q.Id,
+                    Body = q.Body,
+                    Score = q.Score,
+                    Title = q.Title,
+                    Answers = q.Answers.Select((a) => new Answer()
+                    {
+                        Id = a.Id,
+                        Body = a.Body
+                    })
+                });
             }
             return result;
         }
 
         public async Task<Question> GetAsync(Guid id)
         {
-            return await dbContext.Questions.FirstOrDefaultAsync(t => t.Id == id);
+            return await dbContext
+                            .Questions
+                            .Include(q => q.Answers)
+                            .Select((q) => new Question()
+                            {
+                                Id = q.Id,
+                                Body = q.Body,
+                                Score = q.Score,
+                                Title = q.Title,
+                                Answers = q.Answers.Select((a) => new Answer()
+                                {
+                                    Id = a.Id,
+                                    Body = a.Body
+                                })
+                            })
+                            .FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<Question> UpvoteQuestionAsync(Guid id)

@@ -1,11 +1,13 @@
 <template>
-  <article class="container" v-if="question">
+  <article class="container" v-if="question.title">
     <header class="row align-items-center">
       <question-score :question="question" class="col-1" />
       <h3 class="col-11">{{ question.title }}</h3>
     </header>
     <p class="row">
-      <vue-markdown class="offset-1 col-11">{{ question.body }}</vue-markdown>
+      <vue-markdown v-if="question.body" class="offset-1 col-11">
+        {{ question.body }}
+      </vue-markdown>
     </p>
     <ul class="list-unstyled row" v-if="hasAnswers">
       <li
@@ -45,8 +47,9 @@ export default {
   },
   data() {
     return {
-      question: null,
-      answers: [],
+      question: {
+        answers: [],
+      },
       questionId: this.$route.params.id,
     };
   },
@@ -72,9 +75,13 @@ export default {
     onReturnHome() {
       this.$router.push({ name: 'Home' });
     },
-    onAnswerAdded(answer) {
-      if (!this.question.answers.find((a) => a.id === answer.id)) {
-        this.question.answers.push(answer);
+    onAnswerAdded(answers) {
+      if (answers.length > 0) {
+        answers.forEach((answer) => {
+          if (!this.question.answers.find((a) => a.id === answer.id)) {
+            this.question.answers.push(answer);
+          }
+        });
       }
     },
   },

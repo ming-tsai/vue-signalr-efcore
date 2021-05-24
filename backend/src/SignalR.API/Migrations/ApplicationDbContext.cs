@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using SignalR.API.Models;
+using System;
 
 namespace SignalR.API.Migrations
 {

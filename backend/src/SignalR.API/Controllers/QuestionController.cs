@@ -1,15 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.API.Hubs;
-using SignalR.API.Migrations;
 using SignalR.API.Models;
 using SignalR.API.Services;
+using System;
+using System.Collections;
+using System.Threading.Tasks;
 
 namespace SignalR.API.Controllers
 {
@@ -40,15 +36,8 @@ namespace SignalR.API.Controllers
             => await service.AddQuestionAsync(question);
 
         [HttpPost("{id}/answer")]
-        public async Task<ActionResult> AddAnswerAsync(Guid id, [FromBody] Answer answer)
-        {
-            var result = await service.AddAnswerAsync(id, answer);
-            await hubContext
-                    .Clients
-                    .Group(id.ToString())
-                    .AnswerAdded(result);
-            return Ok(result);
-        }
+        public async Task<Answer> AddAnswerAsync(Guid id, [FromBody] Answer answer)
+            => await service.AddAnswerAsync(id, answer);
 
         [HttpPatch("{id}/upvote")]
         public async Task<ActionResult> UpvoteQuestionAsync(Guid id)
